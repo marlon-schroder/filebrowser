@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+podSecurityContext:
+  fsGroup: 33
+
+securityContext:
+  runAsUser: 33
+
+adminPassword:
+  secret: admin-secret
+  key: password
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: traefik
+  # annotations:
+  hosts:
+    - host: example.com
+      paths:
+        - path: /browser
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 0.5
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+
+extraVolumes:
+  - name: from-other-1
+    persistentVolumeClaim:
+      claimName: from-other-1-pvc
+
+extraVolumeMounts:
+  - name: from-other-1
+    mountPath: /srv/other
+
+persistence:
+  enabled: true
+  storageClass: cephfs-triple-class
+  accessMode: ReadWriteMany
+  size: 200Mi
