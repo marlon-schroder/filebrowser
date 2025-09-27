@@ -12,6 +12,8 @@ After changing values.yaml, you can update your deployment using:
 
 ```bash
 helm upgrade filebrowser ./ -n example -f values.yaml
+
+helm template filebrowser ./ -n athena -f athena.yaml > renderizado.yaml
 ```
 
 This chart makes it simple to deploy FileBrowser with flexible and configurable options, even if you are new to Kubernetes or Helm.

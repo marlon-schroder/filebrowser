@@ -13,7 +13,7 @@ securityContext:
 
 adminPassword:
   secret: admin-secret
-  key: password
+  key: hash
 
 service:
   type: ClusterIP
@@ -47,7 +47,7 @@ extraVolumes:
 
 extraVolumeMounts:
   - name: from-other-1
-    mountPath: /srv/other
+    mountPath: /srv/other-1
 
 persistence:
   enabled: true

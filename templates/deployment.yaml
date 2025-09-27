@@ -30,6 +30,7 @@ spec:
       {{- end }}
       {{- with .Values.podSecurityContext }}
       securityContext:
+        fsGroupChangePolicy: "OnRootMismatch"
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
@@ -41,14 +42,23 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{- if .hosts }}
+            {{- $hosts := .Values.ingress.hosts }}
+            {{- if and $hosts (gt (len $hosts) 0) }}
+              {{- $paths := index $hosts 0 "paths" }}
+              {{- if and $paths (gt (len $paths) 0) }}
+                {{- $path := index $paths 0 "path" }}
+                {{- if $path }}
             - name: FB_BASEURL
-              value: {{ index (index .Values.ingress.hosts 0).paths 0 "path" }}
+              value: {{ $path | quote }}
+                {{- end }}
+              {{- end }}
             {{- end }}
             - name: PUID
-              value: {{ .Values.securityContext.runAsUser }}
+              value: {{ .Values.securityContext.runAsUser | quote }}
             - name: PGID
-              value: {{ .Values.podSecurityContext.fsGroup }}
+              value: {{ .Values.podSecurityContext.fsGroup | quote }}
+            - name: FB_PORT
+              value: {{ .Values.service.port | quote }}
             - name: FB_DATABASE
               value: /config/filebrowser.db
             - name: FB_USERNAME
